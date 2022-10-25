@@ -11,10 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -45,20 +42,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        val androidOverlay =
+            GroundOverlayOptions().image(BitmapDescriptorFactory.fromResource(R.drawable.android))
+
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(29.95241967963252, 30.93388293507602)
-        map.addMarker(MarkerOptions().position(sydney).title("Home"))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15f))
+        val homeLocation = LatLng(29.95241967963252, 30.93388293507602)
+        map.addMarker(MarkerOptions().position(homeLocation).title("Home"))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLocation, 15f))
         setOnMapLongClick(map)
         setPoiClick(map)
         setMapStyle(map)
-
+        androidOverlay.position(homeLocation, 100f)
+        map.addGroundOverlay(androidOverlay)
     }
 
     private fun setMapStyle(map: GoogleMap) {
         try {
-            val success = map.setMapStyle(
+            map.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style)
             ).also {
                 if (!it) {
@@ -79,10 +80,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 it.latLng.longitude
             )
             val marker = map.addMarker(
-                MarkerOptions().position(it.latLng)
+                MarkerOptions()
+                    .position(it.latLng)
                     .title(it.name)
                     .snippet("${it.name} $snippet")
-                    .icon(BitmapDescriptorFactory.fromResource(R.raw.down))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.android))
+
             )
             marker?.showInfoWindow()
         }
